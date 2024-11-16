@@ -1,0 +1,31 @@
+#服务地址
+server:
+  port: 8081
+
+#nacos注册中心地址
+spring:
+  application:
+    name: live-user-provider
+  cloud:
+    nacos:
+      discovery:
+        namespace: peng-live
+        server-addr: 111.229.94.137:8848
+#      config:
+#        import-check:
+#          enabled: false
+#        file-extension: yml
+#        server-addr: 111.229.94.137:8848
+#        namespace: peng-live
+
+#dobbu服务地址
+dubbo:
+  application:
+    name: ${spring.application.name}
+    qos-enable: false
+  registry:
+    address: nacos://111.229.94.137:8848?namespace=peng-live
+    id: nacos-registry
+  protocol:
+    name: dubbo
+    port: -1
