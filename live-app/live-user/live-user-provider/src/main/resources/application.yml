@@ -17,12 +17,26 @@ spring:
 #        file-extension: yml
 #        server-addr: 111.229.94.137:8848
 #        namespace: peng-live
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://111.229.94.137:3306/live?useUnicode=true&characterEncoding=utf8
+    username: root
+    password: peng123
+  data:
+    redis:
+      host: 111.229.94.137
+      port: 6379
+      lettuce:
+        pool:
+          min-idle: 10
+          max-active: 100
+          max-idle: 10
 
 #dobbu服务地址
 dubbo:
   application:
     name: ${spring.application.name}
-    qos-enable: false
+    qos-enable: true
   registry:
     address: nacos://111.229.94.137:8848?namespace=peng-live
     id: nacos-registry
