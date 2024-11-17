@@ -25,6 +25,7 @@ target/
 *.iml
 *.ipr
 *.xml
+!*log*.xml
 
 ### NetBeans ###
 nbproject/private/
