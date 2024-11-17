@@ -42,11 +42,12 @@
 </template>  
     
   <script setup>
+import qs from "qs"; // 修正导入方式
 import axios from "axios";
 import { ref } from "vue";
-// import {useRouter} from 'vue-router';
+// import { useRouter } from 'vue-router';
 
-// let router = useRouter()
+// let router = useRouter();
 
 const isLoggedIn = ref(false); // 假设这是从某处（如Vuex或API）获取的登录状态
 const userName = ref("用户名"); // 用户名
@@ -56,18 +57,24 @@ let userAvatar = ref("/img/avatar.png"); // 用户头像路径
 const handleLogin = () => {
   // 添加实际的登录逻辑
   alert("请前往登录页面进行登录");
-  // isLoggedIn.value = true;
-  axios.get("/user/queryUser", { userId: 1 }).then(
-    function (response) {
-    
-      const userInfo=response.data
-      isLoggedIn.value = true;
-      userName.value=userInfo.nickName
-      userAvatar.value=userInfo.avatar
-      console.log(userInfo)
+  
+  // 使用正确的 qs.stringify 方法
+  axios.get("/user/queryUser", {
+    params: { userId: 1 },
+    paramsSerializer: params => qs.stringify(params) // 使用 qs 进行序列化
+  }).then(function (response) {
+    const userInfo = response.data;
+    isLoggedIn.value = true;
+    userName.value = userInfo.nickName; 
+    userAvatar.value = userInfo.avatar;
+    console.log(userInfo);
+  }).catch(function (error) {
+    console.error("获取用户信息失败:", error);
   });
-  // router.push("/login")
+  
+  // router.push("/login");
 };
+
 
 // 处理退出登录逻辑
 const handleLogout = () => {

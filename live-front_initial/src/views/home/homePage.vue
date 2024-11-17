@@ -131,10 +131,10 @@ import {
     Warning,
 } from '@element-plus/icons-vue'
 
-ElMessage({
-    message: '欢迎进入图灵直播系统',
-    type: 'success',
-})
+// ElMessage({
+//     message: '欢迎进入图灵直播系统',
+//     type: 'success',
+// })
 
 const source = ref(0)
 const outputValue = useTransition(source, {

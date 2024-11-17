@@ -21,7 +21,7 @@ spring:
 dubbo:
   application:
     name: ${spring.application.name}
-    qos-enable: true
+    qos-enable: false
   registry:
     address: nacos://111.229.94.137:8848?namespace=peng-live
     id: nacos-registry
