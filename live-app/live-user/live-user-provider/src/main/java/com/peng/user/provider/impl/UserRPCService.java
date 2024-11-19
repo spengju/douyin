@@ -2,6 +2,7 @@ package com.peng.user.provider.impl;
 
 import com.peng.user.dto.UserDTO;
 import com.peng.user.inter.IUserRPCService;
+import com.peng.user.provider.service.SmsService;
 import com.peng.user.provider.service.UserService;
 import jakarta.annotation.Resource;
 import org.apache.dubbo.config.annotation.DubboService;
@@ -16,9 +17,17 @@ import org.apache.dubbo.config.annotation.DubboService;
 public class UserRPCService implements IUserRPCService {
     @Resource
     private UserService userService;
+    @Resource
+    private SmsService smsService;
 
     @Override
     public UserDTO getUserById(Long userId) {
         return userService.getUserById(userId);
+    }
+
+    @Override
+    public boolean sendLoginCode(String mobile) {
+
+        return smsService.sendLoginCode(mobile);
     }
 }

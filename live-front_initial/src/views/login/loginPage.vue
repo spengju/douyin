@@ -3,19 +3,17 @@
     <div class="background-overlay"></div>
     <div class="login-card">
       <h1>打开你的精彩世界</h1>
-      <form @submit.prevent="handleSubmit">
         <div class="form-group">
           <el-input type="tel" maxlength="14" id="usermobile" v-model="mobile" placeholder="请输入手机号" clearable
             required />
         </div>
         <div class="form-group">
           <el-input type="number" maxlength="6" id="code" v-model="code" placeholder="请输入短信验证码" required
-            style="width:70%" />
-          <el-button class="login_sms_code" type="primary" round @click="sendSmsCode()">{{ loginCodeBtn }}</el-button>
+            style="width:60%" />
+          <el-button class="login_sms_code" type="primary" round @click="sendSmsCode()" style="width: 40%;">{{ loginCodeBtn }}</el-button>
         </div>
-        <button type="submit" class="login-btn">登录</button>
+        <button type="submit" class="login-btn" @click="handleLogin">登录</button>
         <button class="wechat-login-btn" @click="showWechatLoginModal = true">微信登录</button>
-      </form>
       <div class="wechat-login-modal" v-if="showWechatLoginModal">
         <div class="modal-content">
           <h2>微信登录</h2>
@@ -32,20 +30,51 @@
 <script setup>
 import { ref } from 'vue'
 import { ElMessage } from 'element-plus'
+import { sendSMS,mobileLogin } from '@/http/api.js'
+import { useRouter } from 'vue-router'
+import { userLoginStore } from '@/stores/userLoginStore'
+
+let router = useRouter()
+let userStore = userLoginStore()
 
 let mobile = ref('');
-let code = ref('ccc');
+let code = ref('');
 let loginCodeBtn = ref('获取验证码')
 let showWechatLoginModal = ref(false);
 
 let hasSendSms = false;
 let lastTime = 60;
 
-function handleSubmit() {
+async function handleLogin() {
   // 登录逻辑处理，这里仅作演示  
   console.log('尝试登录', mobile.value, code.value);
+  if(!checkPhone() || !code.value){
+    ElMessage({
+      message: '请输入正确参数',
+      type: 'error'
+    })
+    return false;
+  }
+  if(!hasSendSms){
+    ElMessage({
+      message: '请先获取验证码',
+      type: 'error'
+    })
+    return false;
+  }
 
-
+  const res = await mobileLogin({mobile:mobile.value,code:code.value})
+  if(res.error){
+    ElMessage({
+      message: res.error,
+      type: 'error'
+    })
+  }else{
+    //登录状态存入Pinia，供其他页面使用。
+    userStore.storeUserId(res.userId);
+    //跳转到首页。
+    router.push("/home")
+  }
 }
 function handleWechatLogin() {
   // 这里应该是调用微信登录的API，然后处理登录结果  
@@ -54,7 +83,7 @@ function handleWechatLogin() {
   console.log('微信登录成功');
   // 你可以在这里添加登录成功后的逻辑，比如跳转到首页  
 }
-function sendSmsCode() {
+async function sendSmsCode() {
   if (!checkPhone()) {
     ElMessage({
       message: '请输入手机号',
@@ -70,27 +99,40 @@ function sendSmsCode() {
     })
     return;
   }
-  //页面提示
-  ElMessage({
-    message: '短信验证码发送中',
-    type: 'success'
-  })
-  //按钮失效
-  hasSendSms = true
-  //显示倒计时
-  var interval = setInterval(() => {
-    loginCodeBtn.value = '发送中(' + lastTime + ')'
-    if (lastTime == 0) {
-      lastTime = 60;
-      loginCodeBtn.value = '获取验证码'
-      hasSendSms = false
-      console.log('清理定时器')
-      clearInterval(interval);
-      return;
-    } else {
-      lastTime = lastTime - 1
-    }
-  }, 1000)
+  // console.info(mobile.value)
+  //请求后端，发送验证码
+  const res = await sendSMS({mobile:mobile.value})
+  // const res = await request.post('/user/sendSMS',qs.stringify({mobile:mobile.value}))
+  // console.info('发送短信验证码', res)
+  if (res) {
+    //页面提示
+    ElMessage({
+      message: '短信验证码发送中',
+      type: 'success'
+    })
+    //按钮失效
+    hasSendSms = true
+    //显示倒计时
+    var interval = setInterval(() => {
+      loginCodeBtn.value = '发送中(' + lastTime + ')'
+      if (lastTime == 0) {
+        lastTime = 60;
+        loginCodeBtn.value = '获取验证码'
+        hasSendSms = false
+console.log('清理定时器')
+        clearInterval(interval);
+        return;
+      } else {
+        lastTime = lastTime - 1
+      }
+    }, 1000)
+  }else {
+    ElMessage({
+      message: '申请验证码失败',
+      type: 'error'
+    })
+    return;
+  }
 }
 
 function checkPhone() {
@@ -146,7 +188,7 @@ function checkPhone() {
   text-align: center;
   position: relative;
   z-index: 1;
-  width: 60vh;
+  width: 40vh;
 }
 
 h1 {
@@ -270,4 +312,4 @@ input[type="password"]:focus {
   font-weight: bold;
   cursor: pointer;
 }
-</style>
+</style>@/store/userLoginStore

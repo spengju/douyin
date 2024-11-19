@@ -42,39 +42,38 @@
 </template>  
     
   <script setup>
-import qs from "qs"; // 修正导入方式
-import axios from "axios";
+
+// import axios from "axios";
 import { ref } from "vue";
-// import { useRouter } from 'vue-router';
+import {queryUserById } from '@/http/api'
+import {useRouter} from 'vue-router';
+import { userLoginStore } from '@/stores/userLoginStore'
 
+let router = useRouter()
+let userStore = userLoginStore()
 // let router = useRouter();
-
 const isLoggedIn = ref(false); // 假设这是从某处（如Vuex或API）获取的登录状态
 const userName = ref("用户名"); // 用户名
 let userAvatar = ref("/img/avatar.png"); // 用户头像路径
 
 // 处理登录逻辑（这里只是模拟，实际中可能是导航到登录页或弹出登录框）
-const handleLogin = () => {
+const handleLogin =async() => {
   // 添加实际的登录逻辑
   alert("请前往登录页面进行登录");
-  
-  // 使用正确的 qs.stringify 方法
-  axios.get("/user/queryUser", {
-    params: { userId: 1 },
-    paramsSerializer: params => qs.stringify(params) // 使用 qs 进行序列化
-  }).then(function (response) {
-    const userInfo = response.data;
-    isLoggedIn.value = true;
-    userName.value = userInfo.nickName; 
-    userAvatar.value = userInfo.avatar;
-    console.log(userInfo);
-  }).catch(function (error) {
-    console.error("获取用户信息失败:", error);
-  });
-  
-  // router.push("/login");
-};
+  router.push("/login");
+  // let userInfo = await queryUserById({'userId':currentUserId})
+  let userInfo = await queryUserById({'userId':1})
+  if(userInfo.error){
+      console.error(userInfo.error)
+    }else{
+      isLoggedIn.value = true;
+      userName.value = userInfo.nickName
+      userAvatar.value = userInfo.avatar
+      // userStore.storeUser(currentUserId,userInfo.nickName,userInfo.avatar)
+    }
 
+//   // 
+};
 
 // 处理退出登录逻辑
 const handleLogout = () => {
@@ -86,6 +85,25 @@ const handleLogout = () => {
 const goto = (target) => {
   console.log("跳转到", target);
 };
+const getUserInfo = async () => {
+  //获取登录时存入Pinia的当前登录用户ID。
+  let currentUserId = userStore.getLoginUserId; 
+  if (currentUserId) {
+    let userInfo = await queryUserById({'userId':currentUserId})
+    if(userInfo.error){
+      console.error(error)
+    }else{
+      isLoggedIn.value = true;
+      userName.value = userInfo.nickName
+      userAvatar.value = userInfo.avatar
+      userStore.storeUser(currentUserId,userInfo.nickName,userInfo.avatar)
+    }
+  } else {
+    isLoggedIn.value = false;
+  }
+}
+//进页面时获取用户信息
+getUserInfo();
 </script>  
     
   <style scoped>

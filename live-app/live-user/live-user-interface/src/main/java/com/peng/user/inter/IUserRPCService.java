@@ -10,5 +10,13 @@ import com.peng.user.dto.UserDTO;
  */
 
 public interface IUserRPCService {
+
     UserDTO getUserById(Long userId);
+
+    /**
+     * 发送短信验证码
+     * @param mobile
+     * @return
+     */
+    boolean sendLoginCode(String mobile);
 }

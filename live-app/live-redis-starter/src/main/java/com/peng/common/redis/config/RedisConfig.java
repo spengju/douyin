@@ -1,7 +1,6 @@
-package com.peng.user.provider.config;
+package com.peng.common.redis.config;
 
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
@@ -10,10 +9,10 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 /**
  * @Author: spengju
  * @Slogan: Day day no bug.
- * @Date: 2024/11/17 17:07
- * @Desc: 解决redis乱码
+ * @Date: 2024/11/17 17:18
+ * @Desc:
  */
-@Configuration
+//@Configuration
 public class RedisConfig {
     @Bean
     public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
